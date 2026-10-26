@@ -21,7 +21,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Optional
 
-from agent.secret_scope import get_secret
+from agent.secret_scope import UnscopedSecretError, get_secret
 from utils import atomic_json_write
 
 logger = logging.getLogger(__name__)
@@ -441,8 +441,11 @@ def _copilot_api_version() -> str:
     """
     try:
         return (get_secret("HERMES_COPILOT_API_VERSION") or "").strip() or _COPILOT_API_VERSION
-    except Exception:
-        logger.debug("HERMES_COPILOT_API_VERSION read failed; using pinned Copilot API date",
+    except UnscopedSecretError:
+        # The one designed raise on this path (multiplex on, no scope installed). The pin applies
+        # to every profile alike, so fail open; anything else is an infrastructure fault the token
+        # read on the same path already lets propagate.
+        logger.debug("HERMES_COPILOT_API_VERSION: unscoped secret read; using pinned date",
                      exc_info=True)
         return _COPILOT_API_VERSION
 

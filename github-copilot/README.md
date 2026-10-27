@@ -50,7 +50,9 @@ Copilot Requests permission. Classic PATs (`ghp_*`) are rejected by the Copilot 
 `COPILOT_API_BASE_URL` overrides the API base URL. Requests pin the Copilot API version
 (`X-GitHub-Api-Version: 2026-08-01`) so `/models` reports the account's real long-context limits
 instead of legacy defaults; override the date with `HERMES_COPILOT_API_VERSION` if GitHub retires
-or advances it.
+or advances it. The value must be a `YYYY-MM-DD` date: a malformed one is not silently ignored —
+every request fails loudly with `400 invalid apiVersion`, so check the value you set first when
+requests start failing.
 
 `GH_TOKEN` and `GITHUB_TOKEN` are shared with other GitHub tools, so on their own they never make Hermes
 contact GitHub. The plugin calls GitHub (token exchange, model list) only once you have chosen Copilot:
